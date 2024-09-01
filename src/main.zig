@@ -27,7 +27,7 @@ pub fn main() anyerror!void {
 
         rl.clearBackground(rl.Color.white);
 
-        rl.drawTriangle(rl.Vector2{100, 100}, rl.Vector2{100,300}, rl.Vector2{200, 200});
+        rl.drawTriangle(rl.Vector2{ .x = 100, .y = 100}, rl.Vector2{ .x = 100, .y = 300 }, rl.Vector2{.x = 200, .y = 200 }, rl.Color.red);
         //----------------------------------------------------------------------------------
     }
 }
