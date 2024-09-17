@@ -21,6 +21,8 @@ pub fn main() anyerror!void {
         defer rl.endDrawing();
 
         rl.clearBackground(rl.Color.white);
+        
+        rl.drawFPS(10, 10);
 
         if (rl.isKeyDown(rl.KeyboardKey.key_w)) {
             pos_y -= 10;
