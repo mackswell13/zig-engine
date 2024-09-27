@@ -10,20 +10,20 @@ pub const Game = struct {
         return Game{ .tile_size = tile_size, .rows = rows, .cols = cols };
     }
 
-    pub fn handle_input(self: Game) void {
-        if (rl.isKeyDown(rl.KeyboardKey.key_g)) {
-            self.show_grid = true;
+    pub fn handle_input(self: *Game) void {
+        if (rl.isKeyPressed(rl.KeyboardKey.key_g) and rl.isKeyDown(rl.KeyboardKey.key_left_control)) {
+            self.show_grid = !self.show_grid;
         }
     }
 
-    pub fn run(self: Game) void {
+    pub fn run(self: *Game) void {
         rl.initWindow(self.rows * self.tile_size, self.cols * self.tile_size, "Test");
         rl.setTargetFPS(60);
 
         while (!rl.windowShouldClose()) {
             rl.beginDrawing();
             defer rl.endDrawing();
-            handle_input();
+            self.handle_input();
 
             rl.clearBackground(rl.Color.white);
             if (self.show_grid) {
@@ -33,7 +33,7 @@ pub const Game = struct {
     }
 };
 
-fn renderGrid(game: Game) void {
+fn renderGrid(game: *Game) void {
     for (0..@intCast(game.rows)) |r| {
         for (0..@intCast(game.cols)) |c| {
             const i: i32 = @intCast(r);
