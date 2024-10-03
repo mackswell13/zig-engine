@@ -1,3 +1,4 @@
+const std = @import("std");
 const rl = @import("raylib");
 
 pub const Game = struct {
@@ -20,18 +21,79 @@ pub const Game = struct {
         rl.initWindow(self.rows * self.tile_size, self.cols * self.tile_size, "Test");
         rl.setTargetFPS(60);
 
+        const camera = rl.Camera2D{
+            .target = rl.Vector2{ .x = 0, .y = 0 },
+            .offset = rl.Vector2{ .x = 0, .y = 0 },
+            .rotation = 0.0,
+            .zoom = 1,
+        };
+
+        var player = Player.init();
+
         while (!rl.windowShouldClose()) {
-            rl.beginDrawing();
-            defer rl.endDrawing();
             self.handle_input();
+            player.update();
+
+            rl.beginDrawing();
+            rl.beginMode2D(camera);
+            defer rl.endMode2D();
+            defer rl.endDrawing();
+
 
             rl.clearBackground(rl.Color.white);
+            drawChunk(0, 0);
+            player.render();
             if (self.show_grid) {
                 renderGrid(self);
             }
         }
     }
 };
+
+const Player = struct {
+    pos: rl.Vector2,
+    color: rl.Color,
+    size: i32,
+
+    pub fn init() Player {
+        return Player{
+            .pos = rl.Vector2{ .x = 10, .y = 10 },
+            .color = rl.Color.blue,
+            .size = 32,
+        };
+    }
+
+    pub fn update(self: *Player) void {
+        if (rl.isKeyPressed(rl.KeyboardKey.key_w)) {
+            self.pos.y -= 1;
+        }
+        if (rl.isKeyPressed(rl.KeyboardKey.key_a)) {
+            self.pos.x -= 1;
+        }
+        if (rl.isKeyPressed(rl.KeyboardKey.key_s)) {
+            self.pos.y += 1;
+        }
+        if (rl.isKeyPressed(rl.KeyboardKey.key_d)) {
+            self.pos.x += 1;
+        }
+        if (rl.isKeyPressed(rl.KeyboardKey.key_p)) {
+            std.debug.print("x: {d}, y {d}\n", .{self.pos.x, self.pos.y});
+        }
+    }
+
+    pub fn render(self: *Player) void {
+        const actual = calcRenderPos(self.pos);
+        rl.drawRectangle(@intFromFloat(actual.x), @intFromFloat(actual.y), self.size, self.size, self.color);
+    }
+};
+
+fn drawChunk(x: i32, y: i32) void {
+    rl.drawRectangle(x, y, 32 * 16, 32 * 16, rl.Color.red);
+}
+
+fn calcRenderPos(pos: rl.Vector2) rl.Vector2 {
+    return rl.Vector2{ .x = pos.x * 32, .y = pos.y * 32 };
+}
 
 fn renderGrid(game: *Game) void {
     for (0..@intCast(game.rows)) |r| {
